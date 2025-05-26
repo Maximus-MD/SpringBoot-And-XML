@@ -1,8 +1,7 @@
 package com.cedacri.car_app.repositories.impl;
 
-import com.cedacri.car_app.entities.Car;
-import com.cedacri.car_app.repositories.CarRepository;
-import lombok.RequiredArgsConstructor;
+import com.cedacri.car_app.entities.Owner;
+import com.cedacri.car_app.repositories.OwnerRepository;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -15,9 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-@RequiredArgsConstructor
-public class CarRepositoryImpl implements CarRepository {
-
+public class OwnerRepositoryImpl implements OwnerRepository {
     SessionFactory sessionFactory = new Configuration()
             .configure(new File("src/main/resources/META-INF/hibernate.cfg.xml"))
             .buildSessionFactory();
@@ -27,13 +24,13 @@ public class CarRepositoryImpl implements CarRepository {
     Transaction transaction = null;
 
     @Override
-    public Optional<Car> getById(String id) {
+    public Optional<Owner> getById(String id) {
         session = sessionFactory.openSession();
-        Car car = null;
+        Owner owner = null;
 
         try {
             transaction = session.beginTransaction();
-            car = session.find(Car.class, id);
+            owner = session.find(Owner.class, id);
             transaction.commit();
         } catch (Exception e) {
             transaction.rollback();
@@ -41,59 +38,58 @@ public class CarRepositoryImpl implements CarRepository {
             session.close();
         }
 
-        return Optional.ofNullable(car);
+        return Optional.ofNullable(owner);
     }
 
     @Override
-    public List<Car> getAll() {
+    public List<Owner> getAll() {
         session = sessionFactory.openSession();
-        List<Car> cars = new ArrayList<>();
+        List<Owner> owners = new ArrayList<>();
 
         try {
             transaction = session.beginTransaction();
-            cars = session.createNativeQuery("SELECT * FROM cars", Car.class).getResultList();
+            owners = session.createNativeQuery("SELECT * FROM owners", Owner.class).getResultList();
             transaction.commit();
         } catch (Exception e) {
             transaction.rollback();
-            e.printStackTrace();
         } finally {
             session.close();
         }
 
-        return cars;
+        return owners;
     }
 
     @Override
-    public void save(Car car) {
+    public void save(Owner owner) {
         session = sessionFactory.openSession();
 
         try {
             transaction = session.beginTransaction();
-            if (car.getVinCode() == null) {
-                session.persist(car);
+            if (owner.getUuid() == null) {
+                session.persist(owner);
             } else {
-                session.merge(car);
+                session.merge(owner);
             }
             transaction.commit();
         } catch (Exception e) {
             transaction.rollback();
-            e.printStackTrace();
         } finally {
             session.close();
         }
     }
 
     @Override
-    public void removeById(String id) {
+    public void removeById(String uuid) {
         session = sessionFactory.openSession();
 
         try {
             transaction = session.beginTransaction();
-            Car car = session.find(Car.class, id);
-            session.remove(car);
+            Owner owner = session.find(Owner.class, uuid);
+            session.remove(owner);
             transaction.commit();
         } catch (Exception e) {
             transaction.rollback();
+            e.printStackTrace();
         } finally {
             session.close();
         }
