@@ -11,9 +11,9 @@ public interface OwnerService {
 
     OwnerDto getOwnerById(String uuid);
 
-    List<OwnerDto> getOwners();
+    List<OwnerDto> getAllOwners();
 
-    ResponseDto saveOwner(OwnerDto ownerDto);
+    OwnerDto saveOwner(OwnerDto ownerDto);
 
     ResponseDto deleteOwnerByUuid(String uuid);
 

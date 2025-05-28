@@ -10,9 +10,11 @@ import java.util.List;
 public interface CarService {
     CarDto getCarByVin(String vin);
 
-    List<CarDto> getCars();
+    List<CarDto> getAllCars();
 
-    ResponseDto saveCar(CarDto carDto);
+    CarDto saveCar(CarDto carDto);
 
     ResponseDto deleteCarByVin(String vin);
+
+    Double getVolumeInLiterByVin(String vin);
 }
