@@ -31,18 +31,23 @@ public class CarController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ResponseDto> saveCar(@Valid @RequestBody CarDto carDto){
+    public ResponseEntity<CarDto> saveCar(@Valid @RequestBody CarDto carDto){
         return ResponseEntity.ok(carService.saveCar(carDto));
     }
 
     @GetMapping("/getAll")
     public ResponseEntity<List<CarDto>> getCars(){
-        List<CarDto> cars = carService.getCars();
+        List<CarDto> cars = carService.getAllCars();
         return ResponseEntity.ok(cars);
     }
 
     @DeleteMapping("/delete/{vin}")
     public ResponseEntity<ResponseDto> deleteCar(@PathVariable("vin") String vin){
         return ResponseEntity.ok(carService.deleteCarByVin(vin));
+    }
+
+    @GetMapping("/get-volume/{vin}")
+    public ResponseEntity<Double> getVolume(@PathVariable("vin") String vin){
+        return ResponseEntity.ok(carService.getVolumeInLiterByVin(vin));
     }
 }

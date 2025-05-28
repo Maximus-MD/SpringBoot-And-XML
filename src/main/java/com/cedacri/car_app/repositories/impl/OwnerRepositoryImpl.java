@@ -26,19 +26,22 @@ public class OwnerRepositoryImpl implements OwnerRepository {
     @Override
     public Optional<Owner> getById(String id) {
         session = sessionFactory.openSession();
-        Owner owner = null;
 
         try {
             transaction = session.beginTransaction();
-            owner = session.find(Owner.class, id);
+            Optional<Owner> result = session.createQuery(
+                    "SELECT o FROM Owner o LEFT JOIN FETCH o.cars WHERE o.uuid = :uuid", Owner.class)
+                    .setParameter("uuid", id)
+                    .uniqueResultOptional();
+
             transaction.commit();
+            return result;
         } catch (Exception e) {
             transaction.rollback();
+            return Optional.empty();
         } finally {
             session.close();
         }
-
-        return Optional.ofNullable(owner);
     }
 
     @Override
@@ -48,7 +51,9 @@ public class OwnerRepositoryImpl implements OwnerRepository {
 
         try {
             transaction = session.beginTransaction();
-            owners = session.createNativeQuery("SELECT * FROM owners", Owner.class).getResultList();
+            owners = session.createQuery(
+                    "SELECT DISTINCT o FROM Owner o LEFT JOIN FETCH o.cars", Owner.class)
+                    .getResultList();
             transaction.commit();
         } catch (Exception e) {
             transaction.rollback();
@@ -60,7 +65,7 @@ public class OwnerRepositoryImpl implements OwnerRepository {
     }
 
     @Override
-    public void save(Owner owner) {
+    public Owner save(Owner owner) {
         session = sessionFactory.openSession();
 
         try {
@@ -76,6 +81,8 @@ public class OwnerRepositoryImpl implements OwnerRepository {
         } finally {
             session.close();
         }
+
+        return owner;
     }
 
     @Override
@@ -89,7 +96,6 @@ public class OwnerRepositoryImpl implements OwnerRepository {
             transaction.commit();
         } catch (Exception e) {
             transaction.rollback();
-            e.printStackTrace();
         } finally {
             session.close();
         }

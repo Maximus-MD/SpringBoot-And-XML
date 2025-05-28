@@ -1,7 +1,12 @@
 package com.cedacri.car_app.entities;
 
+import com.cedacri.car_app.entities.enums.CarTypeEnum;
+import com.cedacri.car_app.entities.enums.FuelTypeEnum;
+import com.cedacri.car_app.entities.enums.TransmissionEnum;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 
 import jakarta.persistence.JoinColumn;
@@ -20,7 +25,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "cars")
 public class Car {
     @Id
-    @Column(name = "car_id", unique = true, nullable = false)
+@Column(name = "car_id", unique = true, nullable = false)
     private String vinCode;
 
     @Column(name = "name", nullable = false)
@@ -38,17 +43,23 @@ public class Car {
     @Column(name = "engine_power", nullable = false)
     private int enginePower;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "fuel_type", nullable = false)
-    private String fuelType;
+    private FuelTypeEnum fuelType;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "transmission")
-    private String transmission;
+    private TransmissionEnum transmission;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
-    private String type;
+    private CarTypeEnum type;
 
-    @Column(name = "num_seats", nullable = false)
+    @Column(name = "seats_num", nullable = false)
     private int numSeats;
+
+    @Column(name = "doors_num", nullable = false)
+    private int doorsNum;
 
     @Column(name = "max_speed")
     private int maxSpeed;

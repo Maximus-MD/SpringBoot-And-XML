@@ -3,6 +3,8 @@ package com.cedacri.car_app.services.impl;
 import com.cedacri.car_app.dto.CarDto;
 import com.cedacri.car_app.dto.ResponseDto;
 import com.cedacri.car_app.entities.Car;
+import com.cedacri.car_app.entities.enums.CarTypeEnum;
+import com.cedacri.car_app.entities.enums.FuelTypeEnum;
 import com.cedacri.car_app.exceptions.CarNotFoundException;
 import com.cedacri.car_app.repositories.CarRepository;
 import com.cedacri.car_app.services.CarService;
@@ -26,15 +28,17 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    public ResponseDto saveCar(CarDto carDto) {
+    public CarDto saveCar(CarDto carDto) {
         Car car = convertToCar(carDto);
+        setTypeBySeatsNumber(car);
+        setTypeByVolume(car);
         carRepository.save(car);
 
-        return new ResponseDto(true);
+        return carDto;
     }
 
     @Override
-    public List<CarDto> getCars() {
+    public List<CarDto> getAllCars() {
         return carRepository.getAll().stream().map(this::convertToDto).toList();
     }
 
@@ -48,6 +52,35 @@ public class CarServiceImpl implements CarService {
         return new ResponseDto(true);
     }
 
+    @Override
+    public Double getVolumeInLiterByVin(String vin) {
+        Car car = carRepository.getById(vin)
+                .orElseThrow(() -> new CarNotFoundException(String.format("Car VIN %s not found.", vin)));
+
+        return (double) car.getEngineVolume() / 1000;
+    }
+
+    private void setTypeByVolume(Car car){
+        if(car.getEngineVolume() >= 10000 && car.getNumSeats() == 4 && car.getDoorsNum() == 2){
+            car.setType(CarTypeEnum.TRUCK);
+        } else if (car.getEngineVolume() < 900 && car.getEngineVolume() >= 600){
+            car.setType(CarTypeEnum.KEI_CAR);
+        } else if (car.getEngineVolume() == 0){
+            car.setType(CarTypeEnum.ELECTRIC_CAR);
+            car.setFuelType(FuelTypeEnum.ELECTRIC);
+        }
+    }
+
+    private void setTypeBySeatsNumber(Car car){
+        if(car.getNumSeats() == 2 && car.getDoorsNum() == 2){
+            car.setType(CarTypeEnum.ROADSTER);
+        } else if (car.getNumSeats() == 4 && car.getDoorsNum() == 2){
+            car.setType(CarTypeEnum.COUPE);
+        } else if (car.getNumSeats() == 7){
+            car.setType(CarTypeEnum.VAN);
+        }
+    }
+
     CarDto convertToDto(Car car) {
         return CarDto.builder()
                 .vin(car.getVinCode())
@@ -58,8 +91,8 @@ public class CarServiceImpl implements CarService {
                 .enginePower(car.getEnginePower())
                 .fuelType(car.getFuelType())
                 .transmission(car.getTransmission())
-                .type(car.getType())
                 .numOfSeats(car.getNumSeats())
+                .doorsNum(car.getDoorsNum())
                 .maxSpeed(car.getMaxSpeed())
                 .build();
     }
@@ -74,8 +107,8 @@ public class CarServiceImpl implements CarService {
                 .enginePower(carDto.enginePower())
                 .fuelType(carDto.fuelType())
                 .transmission(carDto.transmission())
-                .type(carDto.type())
                 .numSeats(carDto.numOfSeats())
+                .doorsNum(carDto.doorsNum())
                 .maxSpeed(carDto.maxSpeed())
                 .build();
     }

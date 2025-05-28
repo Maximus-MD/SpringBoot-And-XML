@@ -55,7 +55,6 @@ public class CarRepositoryImpl implements CarRepository {
             transaction.commit();
         } catch (Exception e) {
             transaction.rollback();
-            e.printStackTrace();
         } finally {
             session.close();
         }
@@ -64,7 +63,7 @@ public class CarRepositoryImpl implements CarRepository {
     }
 
     @Override
-    public void save(Car car) {
+    public Car save(Car car) {
         session = sessionFactory.openSession();
 
         try {
@@ -77,10 +76,11 @@ public class CarRepositoryImpl implements CarRepository {
             transaction.commit();
         } catch (Exception e) {
             transaction.rollback();
-            e.printStackTrace();
         } finally {
             session.close();
         }
+
+        return car;
     }
 
     @Override

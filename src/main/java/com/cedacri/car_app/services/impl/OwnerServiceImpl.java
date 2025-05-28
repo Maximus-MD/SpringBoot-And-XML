@@ -1,5 +1,6 @@
 package com.cedacri.car_app.services.impl;
 
+import com.cedacri.car_app.dto.CarDto;
 import com.cedacri.car_app.dto.OwnerDto;
 import com.cedacri.car_app.dto.ResponseDto;
 import com.cedacri.car_app.entities.Car;
@@ -48,16 +49,16 @@ public class OwnerServiceImpl implements OwnerService {
     }
 
     @Override
-    public List<OwnerDto> getOwners() {
+    public List<OwnerDto> getAllOwners() {
         return ownerRepository.getAll().stream().map(this::convertToDto).toList();
     }
 
     @Override
-    public ResponseDto saveOwner(OwnerDto ownerDto) {
+    public OwnerDto saveOwner(OwnerDto ownerDto) {
         Owner owner = convertToOwner(ownerDto);
         ownerRepository.save(owner);
 
-        return new ResponseDto(true);
+        return ownerDto;
     }
 
     @Override
@@ -78,9 +79,26 @@ public class OwnerServiceImpl implements OwnerService {
     }
 
     private OwnerDto convertToDto(Owner owner) {
+        List<CarDto> cars = owner.getCars().stream()
+                .map(car -> CarDto.builder()
+                        .vin(car.getVinCode())
+                        .name(car.getName())
+                        .model(car.getModel())
+                        .date(car.getDate())
+                        .engineVolume(car.getEngineVolume())
+                        .enginePower(car.getEnginePower())
+                        .fuelType(car.getFuelType())
+                        .transmission(car.getTransmission())
+                        .numOfSeats(car.getNumSeats())
+                        .doorsNum(car.getDoorsNum())
+                        .maxSpeed(car.getMaxSpeed())
+                        .build()
+                ).toList();
+
         return OwnerDto.builder()
                 .firstName(owner.getFirstName())
                 .lastName(owner.getLastName())
+                .cars(cars)
                 .build();
     }
 }

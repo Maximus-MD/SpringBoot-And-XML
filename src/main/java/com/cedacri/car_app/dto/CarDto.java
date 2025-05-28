@@ -1,6 +1,8 @@
 package com.cedacri.car_app.dto;
 
-import com.cedacri.car_app.entities.Owner;
+import com.cedacri.car_app.entities.enums.FuelTypeEnum;
+import com.cedacri.car_app.entities.enums.TransmissionEnum;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -24,22 +26,23 @@ public record CarDto(
         int date,
 
         @NotNull
+        @Min(0)
         int engineVolume,
 
         @NotNull
         int enginePower,
 
         @NotNull
-        String fuelType,
+        FuelTypeEnum fuelType,
 
         @NotNull
-        String transmission,
-
-        @NotNull
-        String type,
+        TransmissionEnum transmission,
 
         @NotNull
         int numOfSeats,
+
+        @NotNull
+        int doorsNum,
 
         @NotNull
         int maxSpeed

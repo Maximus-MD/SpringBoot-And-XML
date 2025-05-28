@@ -25,25 +25,24 @@ public class OwnerController {
     private final OwnerService ownerService;
 
     @GetMapping("/{uuid}")
-    public ResponseEntity<OwnerDto> getCar(@Valid @PathVariable("uuid") String uuid){
+    public ResponseEntity<OwnerDto> getOwner(@Valid @PathVariable("uuid") String uuid){
         OwnerDto response = ownerService.getOwnerById(uuid);
-
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ResponseDto> saveCar(@Valid @RequestBody OwnerDto ownerDto){
+    public ResponseEntity<OwnerDto> saveOwner(@Valid @RequestBody OwnerDto ownerDto){
         return ResponseEntity.ok(ownerService.saveOwner(ownerDto));
     }
 
     @GetMapping("/getAll")
     public ResponseEntity<List<OwnerDto>> getOwners(){
-        List<OwnerDto> owners = ownerService.getOwners();
+        List<OwnerDto> owners = ownerService.getAllOwners();
         return ResponseEntity.ok(owners);
     }
 
     @DeleteMapping("/delete/{uuid}")
-    public ResponseEntity<ResponseDto> deleteCar(@PathVariable("uuid") String uuid){
+    public ResponseEntity<ResponseDto> deleteOwner(@PathVariable("uuid") String uuid){
         return ResponseEntity.ok(ownerService.deleteOwnerByUuid(uuid));
     }
 
