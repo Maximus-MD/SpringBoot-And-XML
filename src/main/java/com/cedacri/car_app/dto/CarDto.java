@@ -23,8 +23,8 @@ public record CarDto(
         @NotBlank(message = "Car model must not be empty.")
         String model,
 
-        @NotNull(message = "Date must not be null.")
-        Integer date,
+        @NotNull(message = "Manufacture year must not be null.")
+        Integer manufactureYear,
 
         @NotNull(message = "Engine volume must not be null.")
         @Min(0)

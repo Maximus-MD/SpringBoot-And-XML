@@ -12,17 +12,20 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @Entity
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "cars")
+@Table(name = "cars", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "car_id")})
 public class Car {
     @Id
     @Column(name = "car_id", unique = true, nullable = false)
@@ -34,8 +37,8 @@ public class Car {
     @Column(name = "model", nullable = false)
     private String model;
 
-    @Column(name = "year", nullable = false)
-    private Integer date;
+    @Column(name = "manufacture_year", nullable = false)
+    private Integer manufactureYear;
 
     @Column(name = "engine_volume")
     private Integer engineVolume;
@@ -66,5 +69,6 @@ public class Car {
 
     @ManyToOne
     @JoinColumn(name = "owner_id")
+    @ToString.Exclude
     private Owner owner;
 }

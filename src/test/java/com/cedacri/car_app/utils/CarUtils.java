@@ -16,7 +16,7 @@ public class CarUtils {
         preparedCar.setVinCode("WDBUF56X48B123654");
         preparedCar.setName("Mazda");
         preparedCar.setModel("RX-7");
-        preparedCar.setDate(1997);
+        preparedCar.setManufactureYear(1997);
         preparedCar.setEngineVolume(1300);
         preparedCar.setEnginePower(280);
         preparedCar.setType(CarTypeEnum.COUPE);
@@ -33,7 +33,7 @@ public class CarUtils {
         preparedTruck.setVinCode("WDBUF56X48B123777");
         preparedTruck.setName("Volvo");
         preparedTruck.setModel("FH16");
-        preparedTruck.setDate(1997);
+        preparedTruck.setManufactureYear(1997);
         preparedTruck.setEngineVolume(11000);
         preparedTruck.setEnginePower(480);
         preparedTruck.setFuelType(FuelTypeEnum.DIESEL);

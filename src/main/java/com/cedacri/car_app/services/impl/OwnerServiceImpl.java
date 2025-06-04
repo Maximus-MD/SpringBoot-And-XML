@@ -56,7 +56,16 @@ public class OwnerServiceImpl implements OwnerService {
     @Override
     public OwnerDto saveOwner(OwnerDto ownerDto) {
         Owner owner = convertToOwner(ownerDto);
+
         ownerRepository.save(owner);
+
+        for (Car car : owner.getCars()) {
+            if (owner.getCars() != null) {
+                car.setOwner(owner);
+                carRepository.save(car);
+            }
+        }
+
 
         return ownerDto;
     }
@@ -66,7 +75,7 @@ public class OwnerServiceImpl implements OwnerService {
         Owner owner = ownerRepository.getById(uuid)
                 .orElseThrow(() -> new OwnerNotFoundException(String.format("Owner with uuid %s not found.", uuid)));
 
-        for(Car car : owner.getCars()){
+        for (Car car : owner.getCars()) {
             car.setOwner(null);
             carRepository.save(car);
         }
@@ -77,9 +86,26 @@ public class OwnerServiceImpl implements OwnerService {
     }
 
     private Owner convertToOwner(OwnerDto ownerDto) {
+        List<Car> cars = ownerDto.cars().stream()
+                .map(carDto -> Car.builder()
+                        .vinCode(carDto.vin())
+                        .name(carDto.name())
+                        .model(carDto.model())
+                        .manufactureYear(carDto.manufactureYear())
+                        .engineVolume(carDto.engineVolume())
+                        .enginePower(carDto.enginePower())
+                        .fuelType(carDto.fuelType())
+                        .transmission(carDto.transmission())
+                        .numSeats(carDto.numOfSeats())
+                        .doorsNum(carDto.doorsNum())
+                        .maxSpeed(carDto.maxSpeed())
+                        .build())
+                .toList();
+
         return Owner.builder()
                 .firstName(ownerDto.firstName())
                 .lastName(ownerDto.lastName())
+                .cars(cars)
                 .build();
     }
 
@@ -89,7 +115,7 @@ public class OwnerServiceImpl implements OwnerService {
                         .vin(car.getVinCode())
                         .name(car.getName())
                         .model(car.getModel())
-                        .date(car.getDate())
+                        .manufactureYear(car.getManufactureYear())
                         .engineVolume(car.getEngineVolume())
                         .enginePower(car.getEnginePower())
                         .fuelType(car.getFuelType())

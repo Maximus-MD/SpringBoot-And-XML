@@ -1,7 +1,9 @@
 package com.cedacri.car_app.repositories.impl;
 
 import com.cedacri.car_app.entities.Car;
+import com.cedacri.car_app.exceptions.CarSaveException;
 import com.cedacri.car_app.repositories.CarRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -11,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Component
 public class CarRepositoryImpl implements CarRepository {
 
@@ -34,6 +37,8 @@ public class CarRepositoryImpl implements CarRepository {
             if (transaction != null) {
                 transaction.rollback();
             }
+            log.error("An error occurred while getting car: {}", car, e);
+            throw e;
         }
 
         return Optional.ofNullable(car);
@@ -63,12 +68,19 @@ public class CarRepositoryImpl implements CarRepository {
 
         try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
+
+            if(carExists(session, car.getVinCode())){
+                throw new CarSaveException("VIN should be unique.");
+            }
+
             session.merge(car);
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
             }
+            log.error("An error occurred while saving: {}", car, e);
+            throw new CarSaveException("Can't save car to DB!");
         }
 
         return car;
@@ -88,5 +100,9 @@ public class CarRepositoryImpl implements CarRepository {
                 transaction.rollback();
             }
         }
+    }
+
+    private boolean carExists(Session session, String vinCode) {
+        return session.find(Car.class, vinCode) != null;
     }
 }

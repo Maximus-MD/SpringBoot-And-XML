@@ -7,13 +7,17 @@ import org.hibernate.cfg.Configuration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.io.File;
+
 @SpringBootApplication
 public class CarAppApplication {
 
     public static void main(String[] args) {
-        Configuration configuration = new Configuration().configure("hibernate.cfg.xml");
-        SessionFactory sessionFactory = configuration.buildSessionFactory();
+        SessionFactory sessionFactory = new Configuration()
+                .configure(new File("src/main/resources/META-INF/hibernate.cfg.xml"))
+                .buildSessionFactory();
         CarRepository repo = new CarRepositoryImpl(sessionFactory);
+
         SpringApplication.run(CarAppApplication.class, args);
     }
 
