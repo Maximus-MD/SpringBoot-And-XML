@@ -3,6 +3,7 @@ package com.cedacri.car_app.dto;
 import com.cedacri.car_app.entities.enums.FuelTypeEnum;
 import com.cedacri.car_app.entities.enums.TransmissionEnum;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -13,37 +14,36 @@ public record CarDto(
 
         @Size(min = 17, max = 17)
         @Pattern(regexp = "(?=.*\\d|[A-Z])(?=.*[A-Z])[A-Z0-9]{17}")
-        @NotNull(message = "VIN can't be empty.")
+        @NotBlank(message = "VIN can't be empty.")
         String vin,
 
-        @NotNull
+        @NotBlank(message = "Car name must not be empty.")
         String name,
 
-        @NotNull
+        @NotBlank(message = "Car model must not be empty.")
         String model,
 
-        @NotNull
-        int date,
+        @NotNull(message = "Manufacture year must not be null.")
+        Integer manufactureYear,
 
-        @NotNull
+        @NotNull(message = "Engine volume must not be null.")
         @Min(0)
-        int engineVolume,
+        Integer engineVolume,
 
-        @NotNull
-        int enginePower,
+        @NotNull(message = "Engine power must not be null.")
+        Integer enginePower,
 
-        @NotNull
+        @NotNull(message = "Fuel type must not be null.")
         FuelTypeEnum fuelType,
 
-        @NotNull
+        @NotNull(message = "Transmission type must not be null.")
         TransmissionEnum transmission,
 
-        @NotNull
-        int numOfSeats,
+        @NotNull(message = "Number of seats must not be null.")
+        Integer numOfSeats,
 
-        @NotNull
-        int doorsNum,
+        @NotNull(message = "Number of door must not be null.")
+        Integer doorsNum,
 
-        @NotNull
-        int maxSpeed
+        Integer maxSpeed
 ) {}

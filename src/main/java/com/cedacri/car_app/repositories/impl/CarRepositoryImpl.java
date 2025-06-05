@@ -1,44 +1,44 @@
 package com.cedacri.car_app.repositories.impl;
 
 import com.cedacri.car_app.entities.Car;
+import com.cedacri.car_app.exceptions.CarSaveException;
 import com.cedacri.car_app.repositories.CarRepository;
-import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.cfg.Configuration;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Component
-@RequiredArgsConstructor
 public class CarRepositoryImpl implements CarRepository {
 
-    SessionFactory sessionFactory = new Configuration()
-            .configure(new File("src/main/resources/META-INF/hibernate.cfg.xml"))
-            .buildSessionFactory();
+    private final SessionFactory sessionFactory;
 
-    Session session = null;
-
-    Transaction transaction = null;
+    public CarRepositoryImpl(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+    }
 
     @Override
     public Optional<Car> getById(String id) {
-        session = sessionFactory.openSession();
+        Transaction transaction = null;
+
         Car car = null;
 
-        try {
+        try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
             car = session.find(Car.class, id);
             transaction.commit();
         } catch (Exception e) {
-            transaction.rollback();
-        } finally {
-            session.close();
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            log.error("An error occurred while getting car: {}", car, e);
+            throw e;
         }
 
         return Optional.ofNullable(car);
@@ -46,17 +46,17 @@ public class CarRepositoryImpl implements CarRepository {
 
     @Override
     public List<Car> getAll() {
-        session = sessionFactory.openSession();
+        Transaction transaction = null;
         List<Car> cars = new ArrayList<>();
 
-        try {
+        try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
             cars = session.createNativeQuery("SELECT * FROM cars", Car.class).getResultList();
             transaction.commit();
         } catch (Exception e) {
-            transaction.rollback();
-        } finally {
-            session.close();
+            if (transaction != null) {
+                transaction.rollback();
+            }
         }
 
         return cars;
@@ -64,20 +64,23 @@ public class CarRepositoryImpl implements CarRepository {
 
     @Override
     public Car save(Car car) {
-        session = sessionFactory.openSession();
+        Transaction transaction = null;
 
-        try {
+        try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
-            if (car.getVinCode() == null) {
-                session.persist(car);
-            } else {
-                session.merge(car);
+
+            if(carExists(session, car.getVinCode())){
+                throw new CarSaveException("VIN should be unique.");
             }
+
+            session.merge(car);
             transaction.commit();
         } catch (Exception e) {
-            transaction.rollback();
-        } finally {
-            session.close();
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            log.error("An error occurred while saving: {}", car, e);
+            throw new CarSaveException("Can't save car to DB!");
         }
 
         return car;
@@ -85,17 +88,21 @@ public class CarRepositoryImpl implements CarRepository {
 
     @Override
     public void removeById(String id) {
-        session = sessionFactory.openSession();
+        Transaction transaction = null;
 
-        try {
+        try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
             Car car = session.find(Car.class, id);
             session.remove(car);
             transaction.commit();
         } catch (Exception e) {
-            transaction.rollback();
-        } finally {
-            session.close();
+            if (transaction != null) {
+                transaction.rollback();
+            }
         }
+    }
+
+    private boolean carExists(Session session, String vinCode) {
+        return session.find(Car.class, vinCode) != null;
     }
 }

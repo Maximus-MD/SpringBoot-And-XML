@@ -21,6 +21,78 @@ public class CarDTOUtils {
         );
     }
 
+    public static CarDto getPreparedCarDtoRoadster() {
+        return new CarDto(
+                "WDBUF56X48B123654",
+                "Honda",
+                "S2000",
+                2005,
+                2200,
+                240,
+                FuelTypeEnum.PETROL,
+                TransmissionEnum.MANUAL,
+                2, 2, 250
+        );
+    }
+
+    public static CarDto getPreparedCarDtoElectric() {
+        return new CarDto(
+                "WDBUF56X48B123654",
+                "Mercedes",
+                "EQS",
+                2024,
+                0,
+                450,
+                null,
+                null,
+                4, 4, 249
+        );
+    }
+
+    public static CarDto getPreparedCarDtoVan() {
+        return new CarDto(
+                "WAUZZZ8K9BA12888",
+                "Kia",
+                "Carnival",
+                2021,
+                2197,
+                180,
+                FuelTypeEnum.DIESEL,
+                TransmissionEnum.AUTOMATIC,
+                7,
+                5,
+                185
+        );
+    }
+
+    public static CarDto getPreparedCarDtoTruck() {
+        return new CarDto(
+                "WDBUF56X48B123654",
+                "Scania",
+                "R480",
+                2006,
+                12740,
+                560,
+                FuelTypeEnum.DIESEL,
+                TransmissionEnum.AUTOMATIC,
+                4, 2, 89
+        );
+    }
+
+    public static CarDto getPreparedCarDtoKeiCar() {
+        return new CarDto(
+                "EA11R56X48B123654",
+                "Suzuki",
+                "Cappucino",
+                1995,
+                657,
+                63,
+                FuelTypeEnum.PETROL,
+                TransmissionEnum.MANUAL,
+                2, 2, 140
+        );
+    }
+
     public static List<CarDto> getPreparedCarDtoList() {
         return List.of(new CarDto(
                         "WDBUF56X48B123654",
@@ -34,15 +106,15 @@ public class CarDTOUtils {
                         4, 2, 260
                 ),
                 new CarDto(
-                        "WDBUF56X48B123654",
-                        "Nissan",
-                        "Skyline",
-                        1999,
-                        2600,
-                        320,
-                        FuelTypeEnum.PETROL,
-                        TransmissionEnum.MANUAL,
-                        4, 2, 260
+                        "WDBUF56X48B123777",
+                        "Volvo",
+                        "FH16",
+                        1997,
+                        11000,
+                        480,
+                        FuelTypeEnum.DIESEL,
+                        TransmissionEnum.AUTOMATIC,
+                        4, 2, 90
                 ));
     }
 }

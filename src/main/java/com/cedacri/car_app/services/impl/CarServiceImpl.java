@@ -5,6 +5,7 @@ import com.cedacri.car_app.dto.ResponseDto;
 import com.cedacri.car_app.entities.Car;
 import com.cedacri.car_app.entities.enums.CarTypeEnum;
 import com.cedacri.car_app.entities.enums.FuelTypeEnum;
+import com.cedacri.car_app.entities.enums.TransmissionEnum;
 import com.cedacri.car_app.exceptions.CarNotFoundException;
 import com.cedacri.car_app.repositories.CarRepository;
 import com.cedacri.car_app.services.CarService;
@@ -30,11 +31,13 @@ public class CarServiceImpl implements CarService {
     @Override
     public CarDto saveCar(CarDto carDto) {
         Car car = convertToCar(carDto);
+
         setTypeBySeatsNumber(car);
         setTypeByVolume(car);
+
         carRepository.save(car);
 
-        return carDto;
+        return convertToDto(car);
     }
 
     @Override
@@ -61,13 +64,14 @@ public class CarServiceImpl implements CarService {
     }
 
     private void setTypeByVolume(Car car){
-        if(car.getEngineVolume() >= 10000 && car.getNumSeats() == 4 && car.getDoorsNum() == 2){
+        if(car.getEngineVolume() >= 10000){
             car.setType(CarTypeEnum.TRUCK);
         } else if (car.getEngineVolume() < 900 && car.getEngineVolume() >= 600){
             car.setType(CarTypeEnum.KEI_CAR);
         } else if (car.getEngineVolume() == 0){
             car.setType(CarTypeEnum.ELECTRIC_CAR);
             car.setFuelType(FuelTypeEnum.ELECTRIC);
+            car.setTransmission(TransmissionEnum.AUTOMATIC);
         }
     }
 
@@ -78,6 +82,10 @@ public class CarServiceImpl implements CarService {
             car.setType(CarTypeEnum.COUPE);
         } else if (car.getNumSeats() == 7){
             car.setType(CarTypeEnum.VAN);
+        } else if (car.getNumSeats() == 4 && car.getDoorsNum() == 4){
+            car.setType(CarTypeEnum.SEDAN);
+        } else if (car.getNumSeats() == 5 && car.getDoorsNum() == 5){
+            car.setType(CarTypeEnum.UNIVERSAL);
         }
     }
 
@@ -86,7 +94,7 @@ public class CarServiceImpl implements CarService {
                 .vin(car.getVinCode())
                 .name(car.getName())
                 .model(car.getModel())
-                .date(car.getDate())
+                .manufactureYear(car.getManufactureYear())
                 .engineVolume(car.getEngineVolume())
                 .enginePower(car.getEnginePower())
                 .fuelType(car.getFuelType())
@@ -102,7 +110,7 @@ public class CarServiceImpl implements CarService {
                 .vinCode(carDto.vin())
                 .name(carDto.name())
                 .model(carDto.model())
-                .date(carDto.date())
+                .manufactureYear(carDto.manufactureYear())
                 .engineVolume(carDto.engineVolume())
                 .enginePower(carDto.enginePower())
                 .fuelType(carDto.fuelType())

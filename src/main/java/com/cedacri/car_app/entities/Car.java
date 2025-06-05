@@ -12,20 +12,23 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @Entity
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "cars")
+@Table(name = "cars", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "car_id")})
 public class Car {
     @Id
-@Column(name = "car_id", unique = true, nullable = false)
+    @Column(name = "car_id", unique = true, nullable = false)
     private String vinCode;
 
     @Column(name = "name", nullable = false)
@@ -34,14 +37,14 @@ public class Car {
     @Column(name = "model", nullable = false)
     private String model;
 
-    @Column(name = "year", nullable = false)
-    private int date;
+    @Column(name = "manufacture_year", nullable = false)
+    private Integer manufactureYear;
 
     @Column(name = "engine_volume")
-    private int engineVolume;
+    private Integer engineVolume;
 
     @Column(name = "engine_power", nullable = false)
-    private int enginePower;
+    private Integer enginePower;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "fuel_type", nullable = false)
@@ -52,19 +55,20 @@ public class Car {
     private TransmissionEnum transmission;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "type", nullable = false)
+    @Column(name = "type")
     private CarTypeEnum type;
 
     @Column(name = "seats_num", nullable = false)
-    private int numSeats;
+    private Integer numSeats;
 
     @Column(name = "doors_num", nullable = false)
-    private int doorsNum;
+    private Integer doorsNum;
 
     @Column(name = "max_speed")
-    private int maxSpeed;
+    private Integer maxSpeed;
 
     @ManyToOne
     @JoinColumn(name = "owner_id")
+    @ToString.Exclude
     private Owner owner;
 }
