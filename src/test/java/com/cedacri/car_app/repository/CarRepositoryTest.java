@@ -51,14 +51,15 @@ public class CarRepositoryTest {
 
     @BeforeEach
     void setupThis() {
-        session = sessionFactory.openSession();
+        session = sessionFactory.getCurrentSession();
         transaction = session.beginTransaction();
     }
 
-//    @AfterEach
-//    void tearThis() {
-//        transaction.commit();
-//    }
+    @AfterEach
+    void tearThis() {
+        transaction.rollback();
+        session.close();
+    }
 
     @AfterEach
     void cleanDatabase() {

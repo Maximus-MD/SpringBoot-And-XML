@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
 
 import java.io.File;
@@ -30,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class OwnerRepositoryTest {
 
@@ -44,18 +46,19 @@ public class OwnerRepositoryTest {
     private Session session = null;
 
     @BeforeEach
-    void setupThis(){
-        session = sessionFactory.openSession();
+    void setupThis() {
+        session = sessionFactory.getCurrentSession();
         session.beginTransaction();
     }
 
     @AfterEach
-    void tearThis(){
-        session.getTransaction().commit();
+    void tearThis() {
+        session.getTransaction().rollback();
+        session.close();
     }
 
     @AfterAll
-    static void tear(){
+    static void tear() {
         sessionFactory.close();
     }
 
