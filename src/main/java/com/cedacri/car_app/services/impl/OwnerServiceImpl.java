@@ -23,6 +23,8 @@ public class OwnerServiceImpl implements OwnerService {
 
     private final CarRepository carRepository;
 
+    private final CarServiceImpl carService;
+
     @Override
     public OwnerDto getOwnerById(String uuid) {
         Owner owner = ownerRepository.getById(uuid)
@@ -57,18 +59,18 @@ public class OwnerServiceImpl implements OwnerService {
     public OwnerDto saveOwner(OwnerDto ownerDto) {
         Owner owner = convertToOwner(ownerDto);
 
-        ownerRepository.save(owner);
-
-        for (Car car : owner.getCars()) {
-            if (owner.getCars() != null) {
+        if (owner.getCars() != null) {
+            for (Car car : owner.getCars()) {
                 car.setOwner(owner);
-                carRepository.save(car);
+                CarDto carDto = carService.convertToDto(car);
+                carService.saveCar(carDto);
             }
         }
 
-
+        ownerRepository.save(owner);
         return ownerDto;
     }
+
 
     @Override
     public ResponseDto deleteOwnerByUuid(String uuid) {

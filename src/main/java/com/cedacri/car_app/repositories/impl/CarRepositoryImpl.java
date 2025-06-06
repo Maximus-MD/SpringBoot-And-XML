@@ -69,11 +69,15 @@ public class CarRepositoryImpl implements CarRepository {
         try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
 
-            if(carExists(session, car.getVinCode())){
-                throw new CarSaveException("VIN should be unique.");
+            Car existingCar = session.find(Car.class, car.getVinCode());
+
+            if (existingCar == null) {
+                session.persist(car);
+            } else {
+                updateCarFields(existingCar, car);
+                session.merge(existingCar);
             }
 
-            session.merge(car);
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) {
@@ -102,7 +106,18 @@ public class CarRepositoryImpl implements CarRepository {
         }
     }
 
-    private boolean carExists(Session session, String vinCode) {
-        return session.find(Car.class, vinCode) != null;
+    private void updateCarFields(Car target, Car source) {
+        target.setName(source.getName());
+        target.setModel(source.getModel());
+        target.setManufactureYear(source.getManufactureYear());
+        target.setEnginePower(source.getEnginePower());
+        target.setEngineVolume(source.getEngineVolume());
+        target.setFuelType(source.getFuelType());
+        target.setTransmission(source.getTransmission());
+        target.setType(source.getType());
+        target.setNumSeats(source.getNumSeats());
+        target.setDoorsNum(source.getDoorsNum());
+        target.setMaxSpeed(source.getMaxSpeed());
+        target.setOwner(source.getOwner());
     }
 }

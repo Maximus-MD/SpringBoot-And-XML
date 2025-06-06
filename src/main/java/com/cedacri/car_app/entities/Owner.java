@@ -37,7 +37,7 @@ public class Owner {
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY)
     @Fetch(FetchMode.SUBSELECT)
     private List<Car> cars = new ArrayList<>();
 

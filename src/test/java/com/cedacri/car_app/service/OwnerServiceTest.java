@@ -7,6 +7,8 @@ import com.cedacri.car_app.entities.Owner;
 import com.cedacri.car_app.exceptions.OwnerNotFoundException;
 import com.cedacri.car_app.repositories.CarRepository;
 import com.cedacri.car_app.repositories.OwnerRepository;
+import com.cedacri.car_app.services.CarService;
+import com.cedacri.car_app.services.impl.CarServiceImpl;
 import com.cedacri.car_app.services.impl.OwnerServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,6 +39,9 @@ public class OwnerServiceTest {
 
     @Mock
     private CarRepository carRepository;
+
+    @Mock
+    private CarServiceImpl carService;
 
     @InjectMocks
     private OwnerServiceImpl ownerService;

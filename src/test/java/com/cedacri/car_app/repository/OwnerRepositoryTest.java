@@ -10,9 +10,6 @@ import com.cedacri.car_app.repositories.impl.OwnerRepositoryImpl;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -43,69 +40,86 @@ public class OwnerRepositoryTest {
 
     private final static CarRepository carRepository = new CarRepositoryImpl(sessionFactory);
 
-    private Session session = null;
-
-    @BeforeEach
-    void setupThis() {
-        session = sessionFactory.getCurrentSession();
-        session.beginTransaction();
-    }
-
-    @AfterEach
-    void tearThis() {
-        session.getTransaction().rollback();
-        session.close();
-    }
-
-    @AfterAll
-    static void tear() {
-        sessionFactory.close();
-    }
-
     @Test
     @Order(1)
     void testGetAll_ReturnOwnerList() {
         List<Owner> savedOwners = getPreparedOwnersListWithoutCars();
 
-        for (Owner owner : savedOwners) {
-            ownerRepository.save(owner);
+        try (Session session = sessionFactory.openSession()){
+            session.beginTransaction();
+            for (Owner owner : savedOwners) {
+                ownerRepository.save(owner);
+            }
+            session.getTransaction().commit();
         }
 
-        List<Owner> expectedOwners = ownerRepository.getAll();
+        try (Session session = sessionFactory.openSession()) {
+            session.beginTransaction();
+            List<Owner> expectedOwners = ownerRepository.getAll();
 
-        assertEquals(new HashSet<>(savedOwners), new HashSet<>(expectedOwners));
+            assertEquals(new HashSet<>(savedOwners), new HashSet<>(expectedOwners));
+            session.getTransaction().rollback();
+        }
+
     }
 
     @Test
     @Order(2)
     void testSave_UpdateExistentOwner() {
         Owner savedOwner = getPreparedOwnerWithOutCar();
-        ownerRepository.save(savedOwner);
+
+        try (Session session = sessionFactory.openSession()){
+            session.beginTransaction();
+            ownerRepository.save(savedOwner);
+            session.getTransaction().commit();
+        }
 
         savedOwner.setLastName("Cojocaru");
-        ownerRepository.save(savedOwner);
 
-        Optional<Owner> expected = ownerRepository.getById(savedOwner.getUuid());
+        try (Session session = sessionFactory.openSession()){
+            session.beginTransaction();
+            ownerRepository.save(savedOwner);
+            session.getTransaction().commit();
+        }
 
-        assertEquals("Cojocaru", expected.get().getLastName());
+        try (Session session = sessionFactory.openSession()){
+            session.beginTransaction();
+            Optional<Owner> expected = ownerRepository.getById(savedOwner.getUuid());
+            assertEquals("Cojocaru", expected.get().getLastName());
+            session.getTransaction().rollback();
+        }
     }
 
     @Test
     @Order(3)
     void whenTryToSaveOwnerWithCar() {
         Car savedCar = getPreparedCar();
-        carRepository.save(savedCar);
+
+        try (Session session = sessionFactory.openSession()){
+            session.beginTransaction();
+            carRepository.save(savedCar);
+            session.getTransaction().commit();
+        }
 
         Owner savedOwner = getPreparedOwnerWithOutCar();
         savedOwner.setCars(List.of(savedCar));
         savedCar.setOwner(savedOwner);
-        ownerRepository.save(savedOwner);
 
-        Optional<Owner> expectedOwner = ownerRepository.getById(savedOwner.getUuid());
-        Optional<Car> expectedCar = carRepository.getById(savedCar.getVinCode());
+        try (Session session = sessionFactory.openSession()){
+            session.beginTransaction();
+            ownerRepository.save(savedOwner);
+            session.getTransaction().commit();
+        }
 
-        assertEquals(savedCar.getVinCode(), expectedCar.get().getVinCode());
-        assertEquals(savedOwner.getFirstName(), expectedOwner.get().getFirstName());
+        try (Session session = sessionFactory.openSession()){
+            session.beginTransaction();
+            Optional<Owner> expectedOwner = ownerRepository.getById(savedOwner.getUuid());
+            Optional<Car> expectedCar = carRepository.getById(savedCar.getVinCode());
+
+            assertEquals(savedCar.getVinCode(), expectedCar.get().getVinCode());
+            assertEquals(savedOwner.getFirstName(), expectedOwner.get().getFirstName());
+            session.getTransaction().rollback();
+        }
     }
 
     @Test
@@ -114,20 +128,33 @@ public class OwnerRepositoryTest {
         Owner savedOwner = getPreparedOwnerWithOutCar();
         savedOwner.setFirstName(null);
 
-        assertThrows(OwnerSaveException.class, () ->
-                ownerRepository.save(savedOwner));
+        try (Session session = sessionFactory.openSession()){
+            session.beginTransaction();
+            assertThrows(OwnerSaveException.class, () ->
+                    ownerRepository.save(savedOwner));
+
+            session.getTransaction().rollback();
+        }
     }
 
     @Test
     @Order(5)
     void testGetById_ReturnOwner() {
-        Owner owner = getPreparedOwnerWithOutCar();
-        ownerRepository.save(owner);
+        Owner savedOwner = getPreparedOwnerWithOutCar();
 
-        Optional<Owner> retrieved = ownerRepository.getById(owner.getUuid());
+        try (Session session = sessionFactory.openSession()){
+            session.beginTransaction();
+            ownerRepository.save(savedOwner);
+            session.getTransaction().commit();
+        }
 
-        assertTrue(retrieved.isPresent(), "Owner should be present but was not found");
-        assertEquals("Maria", retrieved.get().getFirstName());
+        try (Session session = sessionFactory.openSession()){
+            session.beginTransaction();
+            Optional<Owner> retrieved = ownerRepository.getById(savedOwner.getUuid());
+            assertTrue(retrieved.isPresent(), "Owner should be present but was not found");
+            assertEquals("Maria", retrieved.get().getFirstName());
+            session.getTransaction().rollback();
+        }
     }
 
     @Test
@@ -135,23 +162,43 @@ public class OwnerRepositoryTest {
     void testSave_ReturnOwner() {
         Owner savedOwner = getPreparedOwnerWithOutCar();
 
-        ownerRepository.save(savedOwner);
+        try (Session session = sessionFactory.openSession()){
+            session.beginTransaction();
+            ownerRepository.save(savedOwner);
+            session.getTransaction().commit();
+        }
 
-        Optional<Owner> expected = ownerRepository.getById(savedOwner.getUuid());
-
-        assertEquals(savedOwner.getUuid(), expected.get().getUuid());
+        try (Session session = sessionFactory.openSession()){
+            session.beginTransaction();
+            Optional<Owner> expected = ownerRepository.getById(savedOwner.getUuid());
+            assertEquals(savedOwner.getUuid(), expected.get().getUuid());
+            session.getTransaction().rollback();
+        }
     }
 
     @Test
     @Order(7)
     void testRemoveById() {
-        Owner owner = getPreparedOwnerWithOutCar();
-        ownerRepository.save(owner);
+        Owner savedOwner = getPreparedOwnerWithOutCar();
 
-        ownerRepository.removeById(owner.getUuid());
+        try (Session session = sessionFactory.openSession()){
+            session.beginTransaction();
+            ownerRepository.save(savedOwner);
+            session.getTransaction().commit();
+        }
 
-        Optional<Owner> deletedOwner = ownerRepository.getById(owner.getUuid());
+        try (Session session = sessionFactory.openSession()){
+            session.beginTransaction();
+            ownerRepository.removeById(savedOwner.getUuid());
+            session.getTransaction().commit();
+        }
 
-        assertTrue(deletedOwner.isEmpty());
+        try (Session session = sessionFactory.openSession()){
+            session.beginTransaction();
+            Optional<Owner> deletedOwner = ownerRepository.getById(savedOwner.getUuid());
+            assertTrue(deletedOwner.isEmpty());
+            session.getTransaction().rollback();
+        }
+
     }
 }

@@ -12,7 +12,6 @@ public class OwnerUtils {
     private static final Owner owner = new Owner();
 
     public static Owner getPreparedOwner() {
-        owner.setUuid("c3b0d2a2-cf75-4745-a0b6-6c9d83d83d4d");
         owner.setFirstName("Maria");
         owner.setLastName("Bujor");
         owner.setCars(getPreparedCarList());
@@ -21,11 +20,7 @@ public class OwnerUtils {
     }
 
     public static Owner getPreparedOwnerWithOutCar() {
-        owner.setFirstName("Maria");
-        owner.setLastName("Bujor");
-        owner.setCars(Collections.emptyList());
-
-        return owner;
+        return new Owner(null, "Maria", "Cojocaru", Collections.emptyList());
     }
 
     public static List<Owner> getPreparedOwnersList() {
