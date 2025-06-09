@@ -1,12 +1,14 @@
 package com.cedacri.car_app.services.impl;
 
-import com.cedacri.car_app.dto.CarDto;
+import com.cedacri.car_app.dto.CarRequestDto;
 import com.cedacri.car_app.dto.OwnerDto;
 import com.cedacri.car_app.dto.ResponseDto;
 import com.cedacri.car_app.entities.Car;
 import com.cedacri.car_app.entities.Owner;
 import com.cedacri.car_app.exceptions.CarNotFoundException;
 import com.cedacri.car_app.exceptions.OwnerNotFoundException;
+import com.cedacri.car_app.mapper.CarMapper;
+import com.cedacri.car_app.mapper.OwnerMapper;
 import com.cedacri.car_app.repositories.CarRepository;
 import com.cedacri.car_app.repositories.OwnerRepository;
 import com.cedacri.car_app.services.OwnerService;
@@ -30,7 +32,7 @@ public class OwnerServiceImpl implements OwnerService {
         Owner owner = ownerRepository.getById(uuid)
                 .orElseThrow(() -> new OwnerNotFoundException(String.format("Owner with uuid %s not found.", uuid)));
 
-        return convertToDto(owner);
+        return OwnerMapper.convertToDto(owner);
     }
 
     @Override
@@ -52,18 +54,18 @@ public class OwnerServiceImpl implements OwnerService {
 
     @Override
     public List<OwnerDto> getAllOwners() {
-        return ownerRepository.getAll().stream().map(this::convertToDto).toList();
+        return ownerRepository.getAll().stream().map(OwnerMapper::convertToDto).toList();
     }
 
     @Override
     public OwnerDto saveOwner(OwnerDto ownerDto) {
-        Owner owner = convertToOwner(ownerDto);
+        Owner owner = OwnerMapper.convertToOwner(ownerDto);
 
         if (owner.getCars() != null) {
             for (Car car : owner.getCars()) {
                 car.setOwner(owner);
-                CarDto carDto = carService.convertToDto(car);
-                carService.saveCar(carDto);
+                CarRequestDto carRequestDto = CarMapper.convertToRequestDto(car);
+                carService.saveCar(carRequestDto);
             }
         }
 
@@ -85,53 +87,5 @@ public class OwnerServiceImpl implements OwnerService {
         ownerRepository.removeById(owner.getUuid());
 
         return new ResponseDto(true);
-    }
-
-    private Owner convertToOwner(OwnerDto ownerDto) {
-        List<Car> cars = ownerDto.cars().stream()
-                .map(carDto -> Car.builder()
-                        .vinCode(carDto.vin())
-                        .name(carDto.name())
-                        .model(carDto.model())
-                        .manufactureYear(carDto.manufactureYear())
-                        .engineVolume(carDto.engineVolume())
-                        .enginePower(carDto.enginePower())
-                        .fuelType(carDto.fuelType())
-                        .transmission(carDto.transmission())
-                        .numSeats(carDto.numOfSeats())
-                        .doorsNum(carDto.doorsNum())
-                        .maxSpeed(carDto.maxSpeed())
-                        .build())
-                .toList();
-
-        return Owner.builder()
-                .firstName(ownerDto.firstName())
-                .lastName(ownerDto.lastName())
-                .cars(cars)
-                .build();
-    }
-
-    private OwnerDto convertToDto(Owner owner) {
-        List<CarDto> cars = owner.getCars().stream()
-                .map(car -> CarDto.builder()
-                        .vin(car.getVinCode())
-                        .name(car.getName())
-                        .model(car.getModel())
-                        .manufactureYear(car.getManufactureYear())
-                        .engineVolume(car.getEngineVolume())
-                        .enginePower(car.getEnginePower())
-                        .fuelType(car.getFuelType())
-                        .transmission(car.getTransmission())
-                        .numOfSeats(car.getNumSeats())
-                        .doorsNum(car.getDoorsNum())
-                        .maxSpeed(car.getMaxSpeed())
-                        .build()
-                ).toList();
-
-        return OwnerDto.builder()
-                .firstName(owner.getFirstName())
-                .lastName(owner.getLastName())
-                .cars(cars)
-                .build();
     }
 }

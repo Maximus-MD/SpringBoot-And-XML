@@ -1,6 +1,7 @@
 package com.cedacri.car_app.controller;
 
-import com.cedacri.car_app.dto.CarDto;
+import com.cedacri.car_app.dto.CarRequestDto;
+import com.cedacri.car_app.dto.CarResponseDto;
 import com.cedacri.car_app.dto.ResponseDto;
 import com.cedacri.car_app.services.CarService;
 import jakarta.validation.Valid;
@@ -24,21 +25,20 @@ public class CarController {
     private final CarService carService;
 
     @GetMapping("/{vin}")
-    public ResponseEntity<CarDto> getCar(@Valid @PathVariable("vin") String vin){
-        CarDto response = carService.getCarByVin(vin);
+    public ResponseEntity<CarResponseDto> getCar(@Valid @PathVariable("vin") String vin){
+        CarResponseDto response = carService.getCarByVin(vin);
 
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/add")
-    public ResponseEntity<CarDto> saveCar(@Valid @RequestBody final CarDto carDto){
-        return ResponseEntity.ok(carService.saveCar(carDto));
+    public ResponseEntity<CarResponseDto> saveCar(@Valid @RequestBody final CarRequestDto carRequestDto){
+        return ResponseEntity.ok(carService.saveCar(carRequestDto));
     }
 
     @GetMapping("/getAll")
-    public ResponseEntity<List<CarDto>> getCars(){
-        List<CarDto> cars = carService.getAllCars();
-        return ResponseEntity.ok(cars);
+    public ResponseEntity<List<CarResponseDto>> getCars(){
+        return ResponseEntity.ok(carService.getAllCars());
     }
 
     @DeleteMapping("/delete/{vin}")
@@ -47,7 +47,7 @@ public class CarController {
     }
 
     @GetMapping("/get-volume/{vin}")
-    public ResponseEntity<Double> getVolume(@PathVariable("vin") String vin){
+    public ResponseEntity<String> getVolume(@PathVariable("vin") String vin){
         return ResponseEntity.ok(carService.getVolumeInLiterByVin(vin));
     }
 }

@@ -10,7 +10,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Builder;
 
 @Builder
-public record CarDto(
+public record CarRequestDto(
 
         @Size(min = 17, max = 17)
         @Pattern(regexp = "(?=.*\\d|[A-Z])(?=.*[A-Z])[A-Z0-9]{17}")
@@ -39,10 +39,8 @@ public record CarDto(
         @NotNull(message = "Transmission type must not be null.")
         TransmissionEnum transmission,
 
-        @NotNull(message = "Number of seats must not be null.")
         Integer numOfSeats,
 
-        @NotNull(message = "Number of door must not be null.")
         Integer doorsNum,
 
         Integer maxSpeed

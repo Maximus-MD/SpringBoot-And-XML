@@ -1,18 +1,24 @@
 package com.cedacri.car_app.services.impl;
 
-import com.cedacri.car_app.dto.CarDto;
+import com.cedacri.car_app.dto.CarRequestDto;
+import com.cedacri.car_app.dto.CarResponseDto;
 import com.cedacri.car_app.dto.ResponseDto;
 import com.cedacri.car_app.entities.Car;
 import com.cedacri.car_app.entities.enums.CarTypeEnum;
 import com.cedacri.car_app.entities.enums.FuelTypeEnum;
 import com.cedacri.car_app.entities.enums.TransmissionEnum;
 import com.cedacri.car_app.exceptions.CarNotFoundException;
+import com.cedacri.car_app.mapper.CarMapper;
 import com.cedacri.car_app.repositories.CarRepository;
 import com.cedacri.car_app.services.CarService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
+
+import static com.cedacri.car_app.mapper.CarMapper.buildCarResponseDto;
 
 @Component
 @RequiredArgsConstructor
@@ -21,28 +27,29 @@ public class CarServiceImpl implements CarService {
     private final CarRepository carRepository;
 
     @Override
-    public CarDto getCarByVin(String vin) {
-        Car car = carRepository.getById(vin)
-                .orElseThrow(() -> new CarNotFoundException(String.format("Car VIN %s not found.", vin)));
-
-        return convertToDto(car);
-    }
-
-    @Override
-    public CarDto saveCar(CarDto carDto) {
-        Car car = convertToCar(carDto);
+    public CarResponseDto saveCar(CarRequestDto carRequestDto) {
+        Car car = CarMapper.convertToCar(carRequestDto);
 
         setTypeBySeatsNumber(car);
         setTypeByVolume(car);
 
         carRepository.save(car);
 
-        return convertToDto(car);
+        return buildCarResponseDto(carRequestDto, car);
     }
 
     @Override
-    public List<CarDto> getAllCars() {
-        return carRepository.getAll().stream().map(this::convertToDto).toList();
+    public CarResponseDto getCarByVin(String vin) {
+        Car car = carRepository.getById(vin)
+                .orElseThrow(() -> new CarNotFoundException(String.format("Car VIN %s not found.", vin)));
+
+        return CarMapper.convertToResponseDto(car);
+    }
+
+    @Override
+    public List<CarResponseDto> getAllCars() {
+        return carRepository.getAll().stream()
+                .map(CarMapper::convertToResponseDto).toList();
     }
 
     @Override
@@ -56,11 +63,13 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    public Double getVolumeInLiterByVin(String vin) {
+    public String getVolumeInLiterByVin(String vin) {
         Car car = carRepository.getById(vin)
                 .orElseThrow(() -> new CarNotFoundException(String.format("Car VIN %s not found.", vin)));
 
-        return (double) car.getEngineVolume() / 1000;
+        return "Volume of car " + car.getName() + " " + car.getModel() + " is " +  BigDecimal.valueOf(car.getEngineVolume())
+                .divide(BigDecimal.valueOf(1000), 1, RoundingMode.HALF_UP)
+                .doubleValue() + "L.";
     }
 
     private void setTypeByVolume(Car car){
@@ -87,37 +96,5 @@ public class CarServiceImpl implements CarService {
         } else if (car.getNumSeats() == 5 && car.getDoorsNum() == 5){
             car.setType(CarTypeEnum.UNIVERSAL);
         }
-    }
-
-    CarDto convertToDto(Car car) {
-        return CarDto.builder()
-                .vin(car.getVinCode())
-                .name(car.getName())
-                .model(car.getModel())
-                .manufactureYear(car.getManufactureYear())
-                .engineVolume(car.getEngineVolume())
-                .enginePower(car.getEnginePower())
-                .fuelType(car.getFuelType())
-                .transmission(car.getTransmission())
-                .numOfSeats(car.getNumSeats())
-                .doorsNum(car.getDoorsNum())
-                .maxSpeed(car.getMaxSpeed())
-                .build();
-    }
-
-    Car convertToCar(CarDto carDto){
-        return Car.builder()
-                .vinCode(carDto.vin())
-                .name(carDto.name())
-                .model(carDto.model())
-                .manufactureYear(carDto.manufactureYear())
-                .engineVolume(carDto.engineVolume())
-                .enginePower(carDto.enginePower())
-                .fuelType(carDto.fuelType())
-                .transmission(carDto.transmission())
-                .numSeats(carDto.numOfSeats())
-                .doorsNum(carDto.doorsNum())
-                .maxSpeed(carDto.maxSpeed())
-                .build();
     }
 }

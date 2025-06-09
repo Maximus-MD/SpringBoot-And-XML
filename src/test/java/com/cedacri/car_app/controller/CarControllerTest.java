@@ -1,6 +1,7 @@
 package com.cedacri.car_app.controller;
 
-import com.cedacri.car_app.dto.CarDto;
+import com.cedacri.car_app.dto.CarRequestDto;
+import com.cedacri.car_app.dto.CarResponseDto;
 import com.cedacri.car_app.dto.ResponseDto;
 import com.cedacri.car_app.services.CarService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,9 +17,10 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
 
+import static com.cedacri.car_app.utils.CarRequestDtoUtils.getPreparedCarRequestDto;
+import static com.cedacri.car_app.utils.CarResponseDtoUtils.getPreparedCarResponseDto;
+import static com.cedacri.car_app.utils.CarResponseDtoUtils.getPreparedCarResponseDtoList;
 import static org.hamcrest.Matchers.hasSize;
-import static com.cedacri.car_app.utils.CarDTOUtils.getPreparedCarDto;
-import static com.cedacri.car_app.utils.CarDTOUtils.getPreparedCarDtoList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -48,29 +50,30 @@ public class CarControllerTest {
 
     @Test
     void shouldReturnOkStatusWithResponse_WhenGetCarIsSuccessful() throws Exception {
-        CarDto carDto = getPreparedCarDto();
+        CarRequestDto request = getPreparedCarRequestDto();
+        CarResponseDto response = getPreparedCarResponseDto();
 
-        when(carService.getCarByVin(any())).thenReturn(carDto);
+        when(carService.getCarByVin(request.vin())).thenReturn(response);
 
         mockMvc.perform(get("/cars/WDBUF56X48B123654"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.vin").value(carDto.vin()))
-                .andExpect(jsonPath("$.name").value(carDto.name()))
-                .andExpect(jsonPath("$.model").value(carDto.model()))
-                .andExpect(jsonPath("$.manufactureYear").value(carDto.manufactureYear()))
-                .andExpect(jsonPath("$.engineVolume").value(carDto.engineVolume()))
-                .andExpect(jsonPath("$.enginePower").value(carDto.enginePower()))
-                .andExpect(jsonPath("$.fuelType").value(carDto.fuelType().name()))
-                .andExpect(jsonPath("$.transmission").value(carDto.transmission().name()))
-                .andExpect(jsonPath("$.numOfSeats").value(carDto.numOfSeats()))
-                .andExpect(jsonPath("$.doorsNum").value(carDto.doorsNum()))
-                .andExpect(jsonPath("$.maxSpeed").value(carDto.maxSpeed()));
+                .andExpect(jsonPath("$.vin").value(response.vin()))
+                .andExpect(jsonPath("$.name").value(response.name()))
+                .andExpect(jsonPath("$.model").value(response.model()))
+                .andExpect(jsonPath("$.manufactureYear").value(response.manufactureYear()))
+                .andExpect(jsonPath("$.engineVolume").value(response.engineVolume()))
+                .andExpect(jsonPath("$.enginePower").value(response.enginePower()))
+                .andExpect(jsonPath("$.fuelType").value(response.fuelType().name()))
+                .andExpect(jsonPath("$.transmission").value(response.transmission().name()))
+                .andExpect(jsonPath("$.numOfSeats").value(response.numOfSeats()))
+                .andExpect(jsonPath("$.doorsNum").value(response.doorsNum()))
+                .andExpect(jsonPath("$.maxSpeed").value(response.maxSpeed()));
     }
 
     @Test
     void shouldReturnOkStatusWithResponse_WhenGetCarsIsSuccessful() throws Exception {
-        List<CarDto> cars = getPreparedCarDtoList();
+        List<CarResponseDto> cars = getPreparedCarResponseDtoList();
 
         when(carService.getAllCars()).thenReturn(cars);
 
@@ -105,10 +108,10 @@ public class CarControllerTest {
 
     @Test
     void shouldReturnOkStatusWithResponse_WhenSaveIsSuccessful() throws Exception {
-        CarDto requestDto = getPreparedCarDto();
-        CarDto responseDto = getPreparedCarDto();
+        CarRequestDto requestDto = getPreparedCarRequestDto();
+        CarResponseDto responseDto = getPreparedCarResponseDto();
 
-        when(carService.saveCar(any())).thenReturn(responseDto);
+        when(carService.saveCar(requestDto)).thenReturn(responseDto);
 
         mockMvc.perform(post("/cars/add")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -130,7 +133,7 @@ public class CarControllerTest {
 
     @Test
     void shouldReturnOkStatusWithResponse_WhenCarDeleteIsSuccessful() throws Exception {
-        CarDto requestDto = getPreparedCarDto();
+        CarRequestDto requestDto = getPreparedCarRequestDto();
         ResponseDto responseDto = new ResponseDto(true);
 
         when(carService.deleteCarByVin(any())).thenReturn(responseDto);
@@ -145,15 +148,15 @@ public class CarControllerTest {
 
     @Test
     void shouldReturnOkStatusWithResponse_WhenConvertToLitersIsSuccessful() throws Exception {
-        String vinCode = "WAUZZZ8K9BA12796";
-        Double liters = 4.5;
+        String vinCode = "WDBUF56X48B123654";
+        String message = "Volume of car Mazda RX-7 is 1.3L.";
 
-        when(carService.getVolumeInLiterByVin(any())).thenReturn(liters);
+        when(carService.getVolumeInLiterByVin(any())).thenReturn(message);
 
         mockMvc.perform(get("/cars/get-volume/{vinCode}", vinCode)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(liters)))
+                .content(objectMapper.writeValueAsString(message)))
                 .andExpect(status().isOk())
-                .andExpect(content().string(liters.toString()));
+                .andExpect(content().string(message));
     }
 }

@@ -40,7 +40,7 @@ public class Car {
     @Column(name = "manufacture_year", nullable = false)
     private Integer manufactureYear;
 
-    @Column(name = "engine_volume")
+    @Column(name = "engine_volume", nullable = false)
     private Integer engineVolume;
 
     @Column(name = "engine_power", nullable = false)
@@ -58,10 +58,10 @@ public class Car {
     @Column(name = "type")
     private CarTypeEnum type;
 
-    @Column(name = "seats_num", nullable = false)
+    @Column(name = "seats_num")
     private Integer numSeats;
 
-    @Column(name = "doors_num", nullable = false)
+    @Column(name = "doors_num")
     private Integer doorsNum;
 
     @Column(name = "max_speed")

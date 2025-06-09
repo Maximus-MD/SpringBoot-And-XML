@@ -1,14 +1,14 @@
 package com.cedacri.car_app.utils;
 
-import com.cedacri.car_app.dto.CarDto;
+import com.cedacri.car_app.dto.CarResponseDto;
 import com.cedacri.car_app.entities.enums.FuelTypeEnum;
 import com.cedacri.car_app.entities.enums.TransmissionEnum;
 
 import java.util.List;
 
-public class CarDTOUtils {
-    public static CarDto getPreparedCarDto() {
-        return new CarDto(
+public class CarResponseDtoUtils {
+    public static CarResponseDto getPreparedCarResponseDto() {
+        return new CarResponseDto(
                 "WDBUF56X48B123654",
                 "Mazda",
                 "RX-7",
@@ -21,8 +21,8 @@ public class CarDTOUtils {
         );
     }
 
-    public static CarDto getPreparedCarDtoRoadster() {
-        return new CarDto(
+    public static CarResponseDto getPreparedCarResponseDtoRoadster() {
+        return new CarResponseDto(
                 "WDBUF56X48B123654",
                 "Honda",
                 "S2000",
@@ -35,8 +35,8 @@ public class CarDTOUtils {
         );
     }
 
-    public static CarDto getPreparedCarDtoElectric() {
-        return new CarDto(
+    public static CarResponseDto getPreparedCarResponseDtoElectric() {
+        return new CarResponseDto(
                 "WDBUF56X48B123654",
                 "Mercedes",
                 "EQS",
@@ -49,8 +49,8 @@ public class CarDTOUtils {
         );
     }
 
-    public static CarDto getPreparedCarDtoVan() {
-        return new CarDto(
+    public static CarResponseDto getPreparedCarResponseDtoVan() {
+        return new CarResponseDto(
                 "WAUZZZ8K9BA12888",
                 "Kia",
                 "Carnival",
@@ -65,8 +65,8 @@ public class CarDTOUtils {
         );
     }
 
-    public static CarDto getPreparedCarDtoTruck() {
-        return new CarDto(
+    public static CarResponseDto getPreparedCarResponseDtoTruck() {
+        return new CarResponseDto(
                 "WDBUF56X48B123654",
                 "Scania",
                 "R480",
@@ -79,8 +79,8 @@ public class CarDTOUtils {
         );
     }
 
-    public static CarDto getPreparedCarDtoKeiCar() {
-        return new CarDto(
+    public static CarResponseDto getPreparedCarResponseDtoKeiCar() {
+        return new CarResponseDto(
                 "EA11R56X48B123654",
                 "Suzuki",
                 "Cappucino",
@@ -93,8 +93,8 @@ public class CarDTOUtils {
         );
     }
 
-    public static List<CarDto> getPreparedCarDtoList() {
-        return List.of(new CarDto(
+    public static List<CarResponseDto> getPreparedCarResponseDtoList() {
+        return List.of(new CarResponseDto(
                         "WDBUF56X48B123654",
                         "Mazda",
                         "RX-7",
@@ -105,7 +105,7 @@ public class CarDTOUtils {
                         TransmissionEnum.MANUAL,
                         4, 2, 260
                 ),
-                new CarDto(
+                new CarResponseDto(
                         "WDBUF56X48B123777",
                         "Volvo",
                         "FH16",

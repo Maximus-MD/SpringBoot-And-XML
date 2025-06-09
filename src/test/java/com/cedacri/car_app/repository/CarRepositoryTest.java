@@ -56,20 +56,12 @@ public class CarRepositoryTest {
     }
 
     @AfterEach
-    void tearThis() {
-        transaction.rollback();
-        session.close();
-    }
-
-    @AfterEach
     void cleanDatabase() {
         try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
             session.createMutationQuery("DELETE FROM Car").executeUpdate();
             session.createMutationQuery("DELETE FROM Owner").executeUpdate();
             transaction.commit();
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
@@ -86,6 +78,27 @@ public class CarRepositoryTest {
         ownerRepository.save(owner);
 
         owner.setCars(List.of(savedCar));
+
+        carRepository.save(savedCar);
+
+        Optional<Car> expected = carRepository.getById(savedCar.getVinCode());
+
+        assertEquals("WDBUF56X48B123654", expected.get().getVinCode());
+    }
+
+    @Test
+    void testSave_WhenExistsUpdate() {
+        Car savedCar = getPreparedCar();
+        Owner owner = getPreparedOwnerWithOutCar();
+
+        ownerRepository.save(owner);
+
+        owner.setCars(List.of(savedCar));
+
+        carRepository.save(savedCar);
+
+        savedCar.setName("Toyota");
+        savedCar.setModel("Altezza");
 
         carRepository.save(savedCar);
 

@@ -1,6 +1,7 @@
 package com.cedacri.car_app.service;
 
-import com.cedacri.car_app.dto.CarDto;
+import com.cedacri.car_app.dto.CarRequestDto;
+import com.cedacri.car_app.dto.CarResponseDto;
 import com.cedacri.car_app.entities.Car;
 import com.cedacri.car_app.entities.enums.CarTypeEnum;
 import com.cedacri.car_app.entities.enums.FuelTypeEnum;
@@ -18,15 +19,17 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
-import static com.cedacri.car_app.utils.CarDTOUtils.getPreparedCarDto;
-import static com.cedacri.car_app.utils.CarDTOUtils.getPreparedCarDtoElectric;
-import static com.cedacri.car_app.utils.CarDTOUtils.getPreparedCarDtoKeiCar;
-import static com.cedacri.car_app.utils.CarDTOUtils.getPreparedCarDtoList;
-import static com.cedacri.car_app.utils.CarDTOUtils.getPreparedCarDtoRoadster;
-import static com.cedacri.car_app.utils.CarDTOUtils.getPreparedCarDtoTruck;
-import static com.cedacri.car_app.utils.CarDTOUtils.getPreparedCarDtoVan;
+import static com.cedacri.car_app.utils.CarRequestDtoUtils.getPreparedCarRequestDto;
+import static com.cedacri.car_app.utils.CarRequestDtoUtils.getPreparedCarRequestDtoElectric;
+import static com.cedacri.car_app.utils.CarRequestDtoUtils.getPreparedCarRequestDtoKeiCar;
+import static com.cedacri.car_app.utils.CarRequestDtoUtils.getPreparedCarRequestDtoRoadster;
+import static com.cedacri.car_app.utils.CarRequestDtoUtils.getPreparedCarRequestDtoTruck;
+import static com.cedacri.car_app.utils.CarRequestDtoUtils.getPreparedCarRequestDtoUniversalCar;
+import static com.cedacri.car_app.utils.CarRequestDtoUtils.getPreparedCarRequestDtoVan;
+import static com.cedacri.car_app.utils.CarResponseDtoUtils.getPreparedCarResponseDtoList;
 import static com.cedacri.car_app.utils.CarUtils.getPreparedCar;
 import static com.cedacri.car_app.utils.CarUtils.getPreparedCarList;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -43,15 +46,27 @@ public class CarServiceTest {
     private CarServiceImpl carService;
 
     @Test
-    void testSaveCar_WhenItDoesNotExist_ReturnResponseCarDto() {
+    void testSaveCar_WhenItDoesNotExist_ReturnCarResponseDto() {
         Car savedCar = getPreparedCar();
-        CarDto requestDto = getPreparedCarDto();
+        CarRequestDto requestDto = getPreparedCarRequestDto();
 
         when(carRepository.save(any(Car.class))).thenReturn(savedCar);
 
-        CarDto responseDto = carService.saveCar(requestDto);
+        CarResponseDto responseDto = carService.saveCar(requestDto);
 
-        assertEquals(requestDto, responseDto);
+        assertAll(
+                () -> assertEquals(requestDto.vin(), responseDto.vin()),
+                () -> assertEquals(requestDto.name(), responseDto.name()),
+                () -> assertEquals(requestDto.model(), responseDto.model()),
+                () -> assertEquals(requestDto.manufactureYear(), responseDto.manufactureYear()),
+                () -> assertEquals(requestDto.engineVolume(), responseDto.engineVolume()),
+                () -> assertEquals(requestDto.enginePower(), responseDto.enginePower()),
+                () -> assertEquals(requestDto.fuelType(), responseDto.fuelType()),
+                () -> assertEquals(requestDto.transmission(), responseDto.transmission()),
+                () -> assertEquals(requestDto.numOfSeats(), responseDto.numOfSeats()),
+                () -> assertEquals(requestDto.doorsNum(), responseDto.doorsNum()),
+                () -> assertEquals(requestDto.maxSpeed(), responseDto.maxSpeed())
+        );
 
         verify(carRepository).save(any(Car.class));
     }
@@ -59,11 +74,11 @@ public class CarServiceTest {
     @Test
     void testGetCarByVin_WhenItExists_ReturnMatchingCarDto() {
         Car car = getPreparedCar();
-        CarDto expectedDto = getPreparedCarDto();
+        CarRequestDto expectedDto = getPreparedCarRequestDto();
 
         when(carRepository.getById(any())).thenReturn(Optional.of(car));
 
-        CarDto actualDto = carService.getCarByVin(expectedDto.vin());
+        CarResponseDto actualDto = carService.getCarByVin(expectedDto.vin());
 
         assertEquals(expectedDto.vin(), actualDto.vin());
 
@@ -72,27 +87,27 @@ public class CarServiceTest {
 
     @Test
     void testGetCarByVin_WhenItDoesNotExists_ThrowCarNotFoundException() {
-        CarDto carDto = getPreparedCarDto();
+        CarRequestDto carRequestDto = getPreparedCarRequestDto();
 
-        when(carRepository.getById(carDto.vin()))
+        when(carRepository.getById(carRequestDto.vin()))
                 .thenReturn(Optional.empty());
 
         CarNotFoundException exception = assertThrows(CarNotFoundException.class,
-                () -> carService.getCarByVin(carDto.vin()));
+                () -> carService.getCarByVin(carRequestDto.vin()));
 
-        assertEquals(String.format("Car VIN %s not found.", carDto.vin()), exception.getMessage());
+        assertEquals(String.format("Car VIN %s not found.", carRequestDto.vin()), exception.getMessage());
 
-        verify(carRepository).getById(carDto.vin());
+        verify(carRepository).getById(carRequestDto.vin());
     }
 
     @Test
     void testGetAllCars_ReturnCarList() {
         List<Car> cars = getPreparedCarList();
-        List<CarDto> expectedDto = getPreparedCarDtoList();
+        List<CarResponseDto> expectedDto = getPreparedCarResponseDtoList();
 
         when(carRepository.getAll()).thenReturn(cars);
 
-        List<CarDto> actualDto = carService.getAllCars();
+        List<CarResponseDto> actualDto = carService.getAllCars();
 
         assertEquals(expectedDto, actualDto);
 
@@ -114,20 +129,21 @@ public class CarServiceTest {
     @Test
     void testGetVolumeInLiters_WhenCarExists_ReturnLiters() {
         Car car = getPreparedCar();
+        String message = "Volume of car Mazda RX-7 is 1.3L.";
 
         when(carRepository.getById(car.getVinCode())).thenReturn(Optional.of(car));
 
-        assertEquals(1.3, carService.getVolumeInLiterByVin(car.getVinCode()));
+        assertEquals(message, carService.getVolumeInLiterByVin(car.getVinCode()));
     }
 
     @Test
     void testSetTypeByVolume_WhenVolumeIsEqualsToZero_SetElectricType() {
-        CarDto requestDto = getPreparedCarDtoElectric();
+        CarRequestDto requestDto = getPreparedCarRequestDtoElectric();
 
         when(carRepository.save(any(Car.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
-        CarDto responseDto = carService.saveCar(requestDto);
+        CarResponseDto responseDto = carService.saveCar(requestDto);
 
         assertEquals(FuelTypeEnum.ELECTRIC, responseDto.fuelType());
         assertEquals(TransmissionEnum.AUTOMATIC, responseDto.transmission());
@@ -137,7 +153,7 @@ public class CarServiceTest {
 
     @Test
     void testSetTypeByVolume_WhenVolumeIsBiggerThan10000_SetTruckType() {
-        CarDto requestDto = getPreparedCarDtoTruck();
+        CarRequestDto requestDto = getPreparedCarRequestDtoTruck();
 
         ArgumentCaptor<Car> captor = ArgumentCaptor.forClass(Car.class);
 
@@ -154,7 +170,7 @@ public class CarServiceTest {
 
     @Test
     void testSetTypeByVolume_WhenVolumeIsFrom600To900_SetKeiCarType() {
-        CarDto requestDto = getPreparedCarDtoKeiCar();
+        CarRequestDto requestDto = getPreparedCarRequestDtoKeiCar();
 
         ArgumentCaptor<Car> captor = ArgumentCaptor.forClass(Car.class);
 
@@ -171,7 +187,7 @@ public class CarServiceTest {
 
     @Test
     void testSetTypeByNumberOfSeats_WhenNumberIsSeven_SetVanType() {
-        CarDto requestDto = getPreparedCarDtoVan();
+        CarRequestDto requestDto = getPreparedCarRequestDtoVan();
 
         ArgumentCaptor<Car> captor = ArgumentCaptor.forClass(Car.class);
 
@@ -188,7 +204,7 @@ public class CarServiceTest {
 
     @Test
     void testSetTypeByNumberOfSeats_WhenNumberOfSeatsAndDoorsAreTwo_SetRoadsterType() {
-        CarDto requestDto = getPreparedCarDtoRoadster();
+        CarRequestDto requestDto = getPreparedCarRequestDtoRoadster();
 
         ArgumentCaptor<Car> captor = ArgumentCaptor.forClass(Car.class);
 
@@ -205,7 +221,7 @@ public class CarServiceTest {
 
     @Test
     void testSetTypeByNumberOfSeats_WhenNumberOfSeatsIsFourAndDoorsAreTwo_SetCoupeType() {
-        CarDto requestDto = getPreparedCarDto();
+        CarRequestDto requestDto = getPreparedCarRequestDto();
 
         ArgumentCaptor<Car> captor = ArgumentCaptor.forClass(Car.class);
 
@@ -218,5 +234,22 @@ public class CarServiceTest {
         Car savedCar = captor.getValue();
 
         assertEquals(CarTypeEnum.COUPE, savedCar.getType());
+    }
+
+    @Test
+    void testSetTypeByNumberOfSeats_WhenNumberOfSeatsIsFiveAndDoorsAreFive_SetUniversalType() {
+        CarRequestDto requestDto = getPreparedCarRequestDtoUniversalCar();
+
+        ArgumentCaptor<Car> captor = ArgumentCaptor.forClass(Car.class);
+
+        when(carRepository.save(any(Car.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        carService.saveCar(requestDto);
+
+        verify(carRepository).save(captor.capture());
+        Car savedCar = captor.getValue();
+
+        assertEquals(CarTypeEnum.UNIVERSAL, savedCar.getType());
     }
 }

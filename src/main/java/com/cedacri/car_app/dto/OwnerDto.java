@@ -14,6 +14,6 @@ public record OwnerDto(
         @NotNull
         String lastName,
 
-        List<CarDto> cars
+        List<CarRequestDto> cars
 ) {
 }
