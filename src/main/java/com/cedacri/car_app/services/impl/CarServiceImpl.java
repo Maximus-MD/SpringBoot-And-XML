@@ -12,7 +12,7 @@ import com.cedacri.car_app.mapper.CarMapper;
 import com.cedacri.car_app.repositories.CarRepository;
 import com.cedacri.car_app.services.CarService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -20,7 +20,7 @@ import java.util.List;
 
 import static com.cedacri.car_app.mapper.CarMapper.buildCarResponseDto;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class CarServiceImpl implements CarService {
 

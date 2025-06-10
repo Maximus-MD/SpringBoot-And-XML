@@ -13,11 +13,11 @@ import com.cedacri.car_app.repositories.CarRepository;
 import com.cedacri.car_app.repositories.OwnerRepository;
 import com.cedacri.car_app.services.OwnerService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class OwnerServiceImpl implements OwnerService {
 
@@ -26,6 +26,23 @@ public class OwnerServiceImpl implements OwnerService {
     private final CarRepository carRepository;
 
     private final CarServiceImpl carService;
+
+    @Override
+    public OwnerDto saveOwner(OwnerDto ownerDto) {
+        Owner owner = OwnerMapper.convertToOwner(ownerDto);
+
+        ownerRepository.save(owner);
+
+        if (owner.getCars() != null) {
+            for (Car car : owner.getCars()) {
+                car.setOwner(owner);
+                CarRequestDto carRequestDto = CarMapper.convertToRequestDto(car);
+                carService.saveCar(carRequestDto);
+            }
+        }
+
+        return ownerDto;
+    }
 
     @Override
     public OwnerDto getOwnerById(String uuid) {
@@ -55,22 +72,6 @@ public class OwnerServiceImpl implements OwnerService {
     @Override
     public List<OwnerDto> getAllOwners() {
         return ownerRepository.getAll().stream().map(OwnerMapper::convertToDto).toList();
-    }
-
-    @Override
-    public OwnerDto saveOwner(OwnerDto ownerDto) {
-        Owner owner = OwnerMapper.convertToOwner(ownerDto);
-
-        if (owner.getCars() != null) {
-            for (Car car : owner.getCars()) {
-                car.setOwner(owner);
-                CarRequestDto carRequestDto = CarMapper.convertToRequestDto(car);
-                carService.saveCar(carRequestDto);
-            }
-        }
-
-        ownerRepository.save(owner);
-        return ownerDto;
     }
 
 
