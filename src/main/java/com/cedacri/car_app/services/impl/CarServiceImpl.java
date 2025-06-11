@@ -11,8 +11,6 @@ import com.cedacri.car_app.exceptions.CarNotFoundException;
 import com.cedacri.car_app.mapper.CarMapper;
 import com.cedacri.car_app.repositories.CarRepository;
 import com.cedacri.car_app.services.CarService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -20,11 +18,13 @@ import java.util.List;
 
 import static com.cedacri.car_app.mapper.CarMapper.buildCarResponseDto;
 
-@Service
-@RequiredArgsConstructor
 public class CarServiceImpl implements CarService {
 
     private final CarRepository carRepository;
+
+    public CarServiceImpl(CarRepository carRepository) {
+        this.carRepository = carRepository;
+    }
 
     @Override
     public CarResponseDto saveCar(CarRequestDto carRequestDto) {
@@ -67,33 +67,33 @@ public class CarServiceImpl implements CarService {
         Car car = carRepository.getById(vin)
                 .orElseThrow(() -> new CarNotFoundException(String.format("Car VIN %s not found.", vin)));
 
-        return "Volume of car " + car.getName() + " " + car.getModel() + " is " +  BigDecimal.valueOf(car.getEngineVolume())
+        return "Volume of car " + car.getName() + " " + car.getModel() + " is " + BigDecimal.valueOf(car.getEngineVolume())
                 .divide(BigDecimal.valueOf(1000), 1, RoundingMode.HALF_UP)
                 .doubleValue() + "L.";
     }
 
-    private void setTypeByVolume(Car car){
-        if(car.getEngineVolume() >= 10000){
+    private void setTypeByVolume(Car car) {
+        if (car.getEngineVolume() >= 10000) {
             car.setType(CarTypeEnum.TRUCK);
-        } else if (car.getEngineVolume() < 900 && car.getEngineVolume() >= 600){
+        } else if (car.getEngineVolume() < 900 && car.getEngineVolume() >= 600) {
             car.setType(CarTypeEnum.KEI_CAR);
-        } else if (car.getEngineVolume() == 0){
+        } else if (car.getEngineVolume() == 0) {
             car.setType(CarTypeEnum.ELECTRIC_CAR);
             car.setFuelType(FuelTypeEnum.ELECTRIC);
             car.setTransmission(TransmissionEnum.AUTOMATIC);
         }
     }
 
-    private void setTypeBySeatsNumber(Car car){
-        if(car.getNumSeats() == 2 && car.getDoorsNum() == 2){
+    private void setTypeBySeatsNumber(Car car) {
+        if (car.getNumSeats() == 2 && car.getDoorsNum() == 2) {
             car.setType(CarTypeEnum.ROADSTER);
-        } else if (car.getNumSeats() == 4 && car.getDoorsNum() == 2){
+        } else if (car.getNumSeats() == 4 && car.getDoorsNum() == 2) {
             car.setType(CarTypeEnum.COUPE);
-        } else if (car.getNumSeats() == 7){
+        } else if (car.getNumSeats() == 7) {
             car.setType(CarTypeEnum.VAN);
-        } else if (car.getNumSeats() == 4 && car.getDoorsNum() == 4){
+        } else if (car.getNumSeats() == 4 && car.getDoorsNum() == 4) {
             car.setType(CarTypeEnum.SEDAN);
-        } else if (car.getNumSeats() == 5 && car.getDoorsNum() == 5){
+        } else if (car.getNumSeats() == 5 && car.getDoorsNum() == 5) {
             car.setType(CarTypeEnum.UNIVERSAL);
         }
     }

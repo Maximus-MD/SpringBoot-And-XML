@@ -7,14 +7,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Slf4j
-@Component
 public class OwnerRepositoryImpl implements OwnerRepository {
 
     private final SessionFactory sessionFactory;
@@ -29,20 +27,19 @@ public class OwnerRepositoryImpl implements OwnerRepository {
 
         try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
-            Optional<Owner> result = session.createQuery(
+            Optional<Owner> owner = session.createQuery(
                             "SELECT o FROM Owner o LEFT JOIN FETCH o.cars WHERE o.uuid = :uuid", Owner.class)
                     .setParameter("uuid", id)
                     .uniqueResultOptional();
 
             transaction.commit();
-            return result;
+            return owner;
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
             }
+            return Optional.empty();
         }
-
-        return Optional.empty();
     }
 
     @Override

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:component-scan base-package="com.cedacri.car_app.exceptions"/>
+
+    <!--  CAR CONTROLLER  -->
+    <bean id="carSaveHandler" class="com.cedacri.car_app.controller.car_request_handlers.CarSaveHandler">
+        <constructor-arg name="carService" ref="carService"/>
+        <constructor-arg name="validator" ref="validator"/>
+    </bean>
+
+    <bean id="carGetByVinHandler" class="com.cedacri.car_app.controller.car_request_handlers.CarGetByVinHandler">
+        <constructor-arg name="carService" ref="carService"/>
+    </bean>
+
+    <bean id="carGetAllHandler" class="com.cedacri.car_app.controller.car_request_handlers.CarGetAllHandler">
+        <constructor-arg name="carService" ref="carService"/>
+    </bean>
+
+    <bean id="carDeleteHandler" class="com.cedacri.car_app.controller.car_request_handlers.CarDeleteHandler">
+        <constructor-arg name="carService" ref="carService"/>
+    </bean>
+
+    <bean id="carGetVolumeInLitersHandler" class="com.cedacri.car_app.controller.car_request_handlers.CarGetVolumeInLitersHandler">
+        <constructor-arg name="carService" ref="carService"/>
+    </bean>
+
+    <!--  OWNER CONTROLLER  -->
+    <bean id="ownerSaveHandler" class="com.cedacri.car_app.controller.owner_request_handlers.OwnerSaveHandler">
+        <constructor-arg name="ownerService" ref="ownerService"/>
+    </bean>
+
+    <bean id="ownerGetByIdHandler" class="com.cedacri.car_app.controller.owner_request_handlers.OwnerGetByIdHandler">
+        <constructor-arg name="ownerService" ref="ownerService"/>
+    </bean>
+
+    <bean id="ownerGetAllHandler" class="com.cedacri.car_app.controller.owner_request_handlers.OwnerGetAllHandler">
+        <constructor-arg name="ownerService" ref="ownerService"/>
+    </bean>
+
+    <bean id="ownerDeleteHandler" class="com.cedacri.car_app.controller.owner_request_handlers.OwnerDeleteHandler">
+        <constructor-arg name="ownerService" ref="ownerService"/>
+    </bean>
+
+    <bean id="ownerSaveToCarHandler" class="com.cedacri.car_app.controller.owner_request_handlers.OwnerSaveToCarHandler">
+        <constructor-arg name="ownerService" ref="ownerService"/>
+    </bean>
+
+    <!--  HANDLER MAPPER FOR CARS  -->
+    <bean class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+        <property name="urlMap">
+            <map>
+                <entry key="/cars/add" value-ref="carSaveHandler"/>
+                <entry key="/cars/getAll" value-ref="carGetAllHandler"/>
+                <entry key="/cars/get-volume/*" value-ref="carGetVolumeInLitersHandler"/>
+                <entry key="/cars/delete/*" value-ref="carDeleteHandler"/>
+                <entry key="/cars/*" value-ref="carGetByVinHandler"/>
+            </map>
+        </property>
+    </bean>
+
+    <!--  HANDLER MAPPER FOR OWNERS  -->
+    <bean class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+        <property name="urlMap">
+            <map>
+                <entry key="/owner/add" value-ref="ownerSaveHandler"/>
+                <entry key="/owner/getAll" value-ref="ownerGetAllHandler"/>
+                <entry key="/owner/delete/*" value-ref="ownerDeleteHandler"/>
+                <entry key="/owner/*" value-ref="ownerGetByIdHandler"/>
+                <entry key="/owner/add-owner" value-ref="ownerSaveToCarHandler"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="ownerService" class="com.cedacri.car_app.services.impl.OwnerServiceImpl">
+        <constructor-arg ref="ownerRepository"/>
+        <constructor-arg ref="carRepository"/>
+        <constructor-arg ref="carService"/>
+    </bean>
+
+    <bean id="carService" class="com.cedacri.car_app.services.impl.CarServiceImpl">
+        <constructor-arg ref="carRepository"/>
+    </bean>
+
+    <bean id="carRepository" class="com.cedacri.car_app.repositories.impl.CarRepositoryImpl">
+        <constructor-arg ref="sessionFactory"/>
+    </bean>
+
+    <bean id="ownerRepository" class="com.cedacri.car_app.repositories.impl.OwnerRepositoryImpl">
+        <constructor-arg ref="sessionFactory"/>
+    </bean>
+
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>
+        <property name="url" value="jdbc:mysql://localhost:3306/cars_db"/>
+        <property name="username" value="root"/>
+        <property name="password" value="user"/>
+    </bean>
+
+    <bean id="sessionFactory"
+          class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="packagesToScan" value="com.cedacri.car_app.entities"/>
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.show_sql">true</prop>
+                <prop key="hibernate.format_sql">true</prop>
+                <prop key="hibernate.hbm2ddl.auto">update</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="txManager"
+          class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+
+    <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
+
+<!--    <bean class="org.springframework.web.servlet.mvc.SimpleControllerHandlerAdapter"/>-->
+</beans>

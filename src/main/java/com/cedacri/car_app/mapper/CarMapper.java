@@ -3,9 +3,7 @@ package com.cedacri.car_app.mapper;
 import com.cedacri.car_app.dto.CarRequestDto;
 import com.cedacri.car_app.dto.CarResponseDto;
 import com.cedacri.car_app.entities.Car;
-import org.springframework.stereotype.Component;
 
-@Component
 public class CarMapper {
     public static CarRequestDto convertToRequestDto(Car car) {
         return CarRequestDto.builder()

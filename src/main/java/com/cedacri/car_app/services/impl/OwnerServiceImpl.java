@@ -12,13 +12,9 @@ import com.cedacri.car_app.mapper.OwnerMapper;
 import com.cedacri.car_app.repositories.CarRepository;
 import com.cedacri.car_app.repositories.OwnerRepository;
 import com.cedacri.car_app.services.OwnerService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
-@RequiredArgsConstructor
 public class OwnerServiceImpl implements OwnerService {
 
     private final OwnerRepository ownerRepository;
@@ -26,6 +22,12 @@ public class OwnerServiceImpl implements OwnerService {
     private final CarRepository carRepository;
 
     private final CarServiceImpl carService;
+
+    public OwnerServiceImpl(OwnerRepository ownerRepository, CarRepository carRepository, CarServiceImpl carService) {
+        this.ownerRepository = ownerRepository;
+        this.carRepository = carRepository;
+        this.carService = carService;
+    }
 
     @Override
     public OwnerDto saveOwner(OwnerDto ownerDto) {

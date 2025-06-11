@@ -4,11 +4,9 @@ import com.cedacri.car_app.dto.CarRequestDto;
 import com.cedacri.car_app.dto.OwnerDto;
 import com.cedacri.car_app.entities.Car;
 import com.cedacri.car_app.entities.Owner;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Component
 public class OwnerMapper {
     public static Owner convertToOwner(OwnerDto ownerDto) {
         List<Car> cars = ownerDto.cars().stream()

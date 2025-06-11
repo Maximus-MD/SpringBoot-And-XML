@@ -7,14 +7,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Slf4j
-@Component
 public class CarRepositoryImpl implements CarRepository {
 
     private final SessionFactory sessionFactory;
@@ -26,7 +24,6 @@ public class CarRepositoryImpl implements CarRepository {
     @Override
     public Optional<Car> getById(String id) {
         Transaction transaction = null;
-
         Car car = null;
 
         try (Session session = sessionFactory.openSession()) {
